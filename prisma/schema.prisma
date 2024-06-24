@@ -31,7 +31,6 @@ model Products {
   price       Float
   stock       Int      @default(0)
   quantity    Int      @default(0)
-  order       Orders?  @relation(fields: [OrderId], references: [orderId])
   OrderId     String?
   cart        Cart?    @relation(fields: [CardId], references: [cartId])
   CardId      String?
@@ -40,17 +39,16 @@ model Products {
 }
 
 model Orders {
-  orderId   String     @id @default(uuid())
+  orderId   String   @id @default(uuid())
   name      String
   price     Float
-  status    String     @default("Pending")
-  stock     Int        @default(0)
-  user      Users      @relation(fields: [UserId], references: [userId])
+  status    String   @default("Pending")
+  stock     Int      @default(0)
+  user      Users    @relation(fields: [UserId], references: [userId])
   UserId    String
-  products  Products[]
   orderDate DateTime
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Cart {

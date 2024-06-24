@@ -16,4 +16,6 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy{
     await this.prisma.$disconnect();
     console.log('database disconnected');
   }
+
+
 }
