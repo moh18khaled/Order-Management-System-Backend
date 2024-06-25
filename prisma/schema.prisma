@@ -53,7 +53,7 @@ model Orders {
 
 model Cart {
   cartId    String     @id @default(uuid())
-  user      Users?
+  user      Users? 
   products  Products[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
