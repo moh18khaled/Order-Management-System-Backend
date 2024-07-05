@@ -54,7 +54,7 @@ export async function Seeding() {
           updatedAt: new Date(),
         },
       },
-    },
+    }, 
     include: { cart: true },
   });
 
@@ -66,7 +66,6 @@ export async function Seeding() {
         description: '',
         price: 100,
         stock: 100,
-        quantity: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -75,7 +74,6 @@ export async function Seeding() {
         description: '',
         price: 150,
         stock: 5,
-        quantity: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -84,7 +82,6 @@ export async function Seeding() {
         description: '',
         price: 300,
         stock: 0,
-        quantity: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

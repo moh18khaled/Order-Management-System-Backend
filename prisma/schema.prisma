@@ -25,36 +25,49 @@ model Users {
 }
 
 model Products {
-  productId   String   @id @default(uuid())
-  name        String
-  description String
-  price       Float
-  stock       Int      @default(0)
-  quantity    Int      @default(0)
-  OrderId     String?
-  cart        Cart?    @relation(fields: [CardId], references: [cartId])
-  CardId      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
+  productId     String           @id @default(uuid())
+  name          String
+  description   String
+  price         Float
+  stock         Int              @default(0)
+  cart          Cart[]
+  order         Orders[]
+  CartToProduct cartAndProduct[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+} 
 
 model Orders {
-  orderId   String   @id @default(uuid())
+  orderId   String     @id @default(uuid())
   name      String
   price     Float
-  status    String   @default("Pending")
-  stock     Int      @default(0)
-  user      Users    @relation(fields: [UserId], references: [userId])
+  status    String     @default("Pending")
+  user      Users      @relation(fields: [UserId], references: [userId])
   UserId    String
+  products  Products[]
   orderDate DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model Cart {
-  cartId    String     @id @default(uuid())
-  user      Users? 
-  products  Products[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  cartId        String           @id @default(uuid())
+  user          Users?
+  products      Products[]
+  CartToProduct cartAndProduct[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model cartAndProduct {
+  id        String   @id @default(uuid())
+  cart      Cart     @relation(fields: [cartId], references: [cartId])
+  cartId    String
+  product   Products @relation(fields: [productId], references: [productId])
+  productId String
+  quantity  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
 }
