@@ -20,6 +20,11 @@ showUsers(){
   return this.testingService.showUsers();
 }
 
+@Get('show/orders')
+showOrders(){
+  return this.testingService.showOrders();
+}
+
 @Delete('delete')
 delete(){
   return this.testingService.delete();

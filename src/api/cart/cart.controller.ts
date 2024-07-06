@@ -21,7 +21,7 @@ export class CartController {
     @Body('quantity') quantity: number,
   ) {
     try {
-      await this.cartService.add(userId, productId, quantity);
+      await this.cartService.addToCart(userId, productId, quantity);
     } catch (err) {
       throw err;
     }
@@ -31,7 +31,7 @@ export class CartController {
   @Get(':userId')
   async view(@Param('userId') userId: string) {
     try {
-      return await this.cartService.view(userId);
+      return await this.cartService.viewCart(userId);
     } catch (err) {
       throw err;
     }
@@ -45,7 +45,7 @@ export class CartController {
     @Body('quantity') quantity: number,
   ) {
     try {
-      await this.cartService.Update(productId, cartId, quantity);
+      await this.cartService.updateProductQuantity(productId, cartId, quantity);
     } catch (err) {
       throw err;
     }
@@ -58,7 +58,7 @@ export class CartController {
     @Body('cartId') cartId: string,
   ) {
     try {
-      await this.cartService.remove(productId, cartId);
+      await this.cartService.removeFromCart(productId, cartId);
     } catch (err) {
       throw err;
     }

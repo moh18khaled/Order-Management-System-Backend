@@ -21,8 +21,116 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     console.log('database disconnected');
   }
 
-  // Add a product to the user's cart
-  async add(userId: string, productId: string, quantity: number) {
+  // Create order
+  async createOrder(userId: string) {
+    const user = await this.User(userId);
+
+    if (!user) throw new NotFoundException(`User with ID ${userId} not found.`);
+
+    const cart = await this.prisma.cart.findFirst({
+      where: {
+        cartId: user.CartId,
+      },
+      include: {
+        products: true,
+        CartToProduct: true,
+      },
+    });
+
+    // Cart is empty
+    if (!cart.products.length)
+      throw new BadRequestException(`Cart with ID ${cart.cartId} is empty.`);
+
+    let totalPrice = 0;
+
+    // totalPrice = productPrice * productQuantity
+    for (let cartToProduct of cart.CartToProduct) {
+      const product = await this.prisma.products.findFirst({
+        where: {
+          productId: cartToProduct.productId,
+        },
+      });
+
+      if (!product)
+        throw new NotFoundException(
+          `Product with ID ${product.productId} not found.`,
+        );
+
+      totalPrice += cartToProduct.quantity * product.price;
+    }
+
+    await this.prisma.orders.create({
+      data: {
+        price: totalPrice,
+        user: {
+          connect: {
+            userId: userId,
+          },
+        },
+        products: {
+          // Connect products from the cart to the order by productId
+          connect: cart.products.map((Cart) => ({
+            productId: Cart.productId,
+          })),
+        },
+        orderDate: new Date(),
+        arrivesAt: new Date(),
+      },
+    });
+
+    // Clear the products array in the Cart
+    await this.prisma.cart.update({
+      where: { cartId: cart.cartId },
+      data: {
+        products: {
+          set: [], // Clear the products array by setting it to an empty array
+        },
+      },
+    });
+
+    // Delete all cartAndProduct entries that were associated with the cart
+    await this.prisma.cartAndProduct.deleteMany({
+      where: {
+        cartId: cart.cartId,
+      },
+    });
+  }
+
+  // Retrieve user's order
+  async retrieveOrder(orderId: string) {
+    const order = await this.prisma.orders.findFirst({
+      where: {
+        orderId,
+      },
+    });
+    if (!order)
+      throw new NotFoundException(`order with ID ${orderId} not found.`);
+
+    return order;
+  }
+
+  // Updates order status
+  async updateOrderStatus(orderId: string, status: string) {
+    const order = await this.prisma.orders.findFirst({
+      where: {
+        orderId,
+      },
+    });
+    if (!order)
+      throw new NotFoundException(`order with ID ${orderId} not found.`);
+
+    await this.prisma.orders.update({
+      where: {
+        orderId,
+      },
+      data: {
+        status,
+      },
+    });
+  }
+
+  // Add a product to user's cart
+  async addToCart(userId: string, productId: string, quantity: number) {
     const user = await this.User(userId);
 
     if (!user) throw new NotFoundException(`User with ID ${userId} not found.`);
@@ -37,7 +145,6 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     let productToCart = await this.ProductToCart(productId, cartId);
 
     if (!productToCart) {
-
       // Check if the requested quantity exceeds available stock
       if (quantity > product.stock) {
         throw new BadRequestException(
@@ -78,12 +185,12 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
       });
     } else {
       // If product is already in cart, update the quantity
-      this.Update(productId, cartId, quantity);
+      this.updateProductQuantity(productId, cartId, quantity);
     }
   }
 
   // View the user's cart
-  async view(userId: string) {
+  async viewCart(userId: string) {
     const user = await this.User(userId);
 
     if (!user) throw new NotFoundException(`User with ID ${userId} not found.`);
@@ -104,7 +211,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   }
 
   // Update a product's quantity in the cart
-  async Update(productId: string, cartId: string, quantity: number) {
+  async updateProductQuantity(productId: string, cartId: string, quantity: number) {
     const product = await this.Product(productId);
 
     if (!product)
@@ -123,7 +230,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     // Check if the requested quantity exceeds available stock
     if (quantity > product.stock + productToCart.quantity) {
       // Check if the product is not currently in the cart
-      if (!productToCart.quantity) await this.remove(productId, cartId);
+      if (!productToCart.quantity) await this.removeFromCart(productId, cartId);
 
       throw new BadRequestException(
         `Stock is insufficient for the requested quantity (${quantity}) of product ${productId}. Current stock: ${product.stock}.`,
@@ -132,7 +239,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
     // If quantity is zero, remove the product from the cart
     if (!quantity) {
-      this.remove(productId, cartId);
+      this.removeFromCart(productId, cartId);
     } else {
       // Update product stock
       await this.prisma.products.update({
@@ -171,7 +278,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   }
 
   // Remove a product from the cart
-  async remove(productId: string, cartId: string) {
+  async removeFromCart(productId: string, cartId: string) {
     const cart = await this.Cart(cartId);
     if (!cart) throw new NotFoundException(`Cart with ID ${cartId} not found.`);
 
@@ -252,9 +359,8 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   async ProductToCart(productId: string, cartId: string) {
     const productToCart = await this.prisma.cartAndProduct.findFirst({
       where: {
-
         productId,
-        cartId
+        cartId,
       },
     });
 

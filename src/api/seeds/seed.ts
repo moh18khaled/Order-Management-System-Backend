@@ -2,13 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-
 export async function Seeding() {
-   
-  
-
-
-    
   //creating users and carts
   await prisma.users.create({
     data: {
@@ -41,7 +35,7 @@ export async function Seeding() {
     },
     include: { cart: true },
   });
-
+  
   await prisma.users.create({
     data: {
       name: 'ahmed',
@@ -54,7 +48,7 @@ export async function Seeding() {
           updatedAt: new Date(),
         },
       },
-    }, 
+    },
     include: { cart: true },
   });
 
@@ -88,6 +82,3 @@ export async function Seeding() {
     ],
   });
 }
-
-
- 
