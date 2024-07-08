@@ -35,7 +35,7 @@ export async function Seeding() {
     },
     include: { cart: true },
   });
-  
+
   await prisma.users.create({
     data: {
       name: 'ahmed',

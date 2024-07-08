@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-
 @Injectable()
 export class OrdersService {
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-// Add a product to the user's cart
+  // Add a product to the user's cart
   async createOrder(userId: string) {
     try {
       await this.prisma.createOrder(userId);
@@ -15,7 +14,7 @@ export class OrdersService {
     }
   }
 
-// Retrieve the user's order
+  // Retrieve the user's order
   async retrieveOrder(orderId: string) {
     try {
       return await this.prisma.retrieveOrder(orderId);
@@ -24,13 +23,12 @@ export class OrdersService {
     }
   }
 
-// Updates order status
-  async updateOrderStatus(orderId: string,status:string) {
+  // Updates order status
+  async updateOrderStatus(orderId: string, status: string) {
     try {
-       await this.prisma.updateOrderStatus(orderId,status);
+      await this.prisma.updateOrderStatus(orderId, status);
     } catch (err) {
       throw err;
     }
   }
-    
 }

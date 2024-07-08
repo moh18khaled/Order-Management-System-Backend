@@ -9,9 +9,7 @@ import { PrismaClient } from '@prisma/client';
   imports: [OrdersModule, CartModule, TestingModule],
   providers: [PrismaClient],
 })
-
 export class ApiModule implements OnModuleInit {
-
   constructor(private prisma: PrismaClient) {}
 
   async onModuleInit() {
@@ -22,7 +20,8 @@ export class ApiModule implements OnModuleInit {
         },
       });
 
-      if (!user) { // checking if the database is not seeded
+      if (!user) {
+        // checking if the database is not seeded
         console.log('Seeding data');
         await Seeding();
         console.log('Seeding completed.');
@@ -31,8 +30,8 @@ export class ApiModule implements OnModuleInit {
       }
     } catch (err) {
       console.error('Error in onModuleInit:', err);
-    } finally {   
+    } finally {
       await this.prisma.$disconnect();
     }
   }
-}   
+}

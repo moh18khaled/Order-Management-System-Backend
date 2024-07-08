@@ -13,15 +13,15 @@ export class TestingService {
       },
     });
   }
-
+ 
   async showCarts() {
     return await this.prisma.cart.findMany({
       include: {
-        products:true,
+        products: true,
         CartToProduct: true,
-        user:true 
+        user: true,
       },
-    }); 
+    });
   }
 
   async showUsers() {
@@ -30,12 +30,10 @@ export class TestingService {
 
   async showOrders() {
     return await this.prisma.orders.findMany({
-
       include: {
-        products:true,
-        user:true 
+        products: true,
+        user: true,
       },
-
     });
   }
 
@@ -45,5 +43,5 @@ export class TestingService {
     await this.prisma.products.deleteMany();
     await this.prisma.users.deleteMany();
     await this.prisma.cart.deleteMany();
-  } 
-} 
+  }
+}

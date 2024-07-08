@@ -3,7 +3,6 @@ import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
-
 @Module({
   imports: [PrismaModule],
   controllers: [OrdersController],

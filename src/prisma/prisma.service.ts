@@ -211,7 +211,11 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   }
 
   // Update a product's quantity in the cart
-  async updateProductQuantity(productId: string, cartId: string, quantity: number) {
+  async updateProductQuantity(
+    productId: string,
+    cartId: string,
+    quantity: number,
+  ) {
     const product = await this.Product(productId);
 
     if (!product)

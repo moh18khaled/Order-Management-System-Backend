@@ -23,7 +23,11 @@ export class CartService {
   }
 
   // Update a product's quantity in the cart
-  async updateProductQuantity(productId: string, cartId: string, quantity: number) {
+  async updateProductQuantity(
+    productId: string,
+    cartId: string,
+    quantity: number,
+  ) {
     try {
       await this.prisma.updateProductQuantity(productId, cartId, quantity);
     } catch (err) {
